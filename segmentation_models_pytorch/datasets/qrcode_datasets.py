@@ -48,6 +48,9 @@ class QrcodeDataset(torch.utils.data.Dataset):
         # image = np.array(Image.fromarray(sample["image"]).resize((384, 384), Image.BILINEAR))
         # mask = np.array(Image.fromarray(sample["mask"]).resize((384, 384), Image.NEAREST))
         # trimap = np.array(Image.fromarray(sample["trimap"]).resize((384, 384), Image.NEAREST))
+        image = Image.fromarray(sample["image"])
+        mask = np.array(Image.fromarray(sample["mask"]))
+        trimap = np.array(Image.fromarray(sample["trimap"]))
 
         # convert to other format HWC -> CHW
         # sample["image"] = np.moveaxis(image, -1, 0)
@@ -69,9 +72,9 @@ class QrcodeDataset(torch.utils.data.Dataset):
             if (self.masks_directory / filepath.name).exists():
                 filenames.append(str(filepath.name))
         if self.mode == "train":  # 90% for train
-            filenames = [x for i, x in enumerate(filenames) if i % 10 != 0]
+            filenames = [x for i, x in enumerate(filenames) if i % 500 != 0]
         elif self.mode == "valid":  # 10% for validation
-            filenames = [x for i, x in enumerate(filenames) if i % 10 == 0]
+            filenames = [x for i, x in enumerate(filenames) if i % 500 == 0]
         elif self.mode == "test":
-            filenames = [x for i, x in enumerate(filenames) if i % 20 == 0]
+            filenames = [x for i, x in enumerate(filenames) if i % 500 == 0]
         return filenames
