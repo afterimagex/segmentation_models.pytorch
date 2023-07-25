@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  jupyter-dns:
+    build: .
+    container_name: jupyter-notebook-dns
+    ports:
+      - "8888:8888"
+    volumes:
+      - ../:/workspace
+    environment:
+      - LANG=zh_CN.UTF-8
+    command: start-notebook.sh --NotebookApp.notebook_dir="/workspace"
