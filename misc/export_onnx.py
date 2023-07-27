@@ -28,8 +28,9 @@ if __name__ == '__main__':
 
     model = PetModel("UNet", "timm-mobilenetv3_small_100", in_channels=1, out_classes=1)
     
-    state_dict = torch.load('../examples/qrcode-unet-mbv3-100.1.pth')
-    model.load_state_dict(state_dict)
+    model_name = 'qrcode-unet-mbv3-100.3'
+    checkpoints = torch.load(f'../data/{model_name}.pth')
+    model.load_state_dict(checkpoints['state_dict'])
 
     with torch.no_grad():
         model.eval()
@@ -39,7 +40,7 @@ if __name__ == '__main__':
         # Export the model   
         torch.onnx.export(model,         # model being run 
                         dummy_input,       # model input (or a tuple for multiple inputs) 
-                        "qrcode-unet-mbv3-100.onnx",       # where to save the model  
+                        f"../data/{model_name}.onnx",       # where to save the model  
                         export_params=True,  # store the trained parameter weights inside the model file 
                         opset_version=11,    # the ONNX version to export the model to 
                         do_constant_folding=True,  # whether to execute constant folding for optimization 

@@ -79,11 +79,13 @@ class QRAugmentation(object):
         return albu.Compose([
             albu.HorizontalFlip(p=0.5),
 
-            albu.ShiftScaleRotate(scale_limit=0.5, rotate_limit=0, shift_limit=0.01, p=1, border_mode=0),
+            albu.ShiftScaleRotate(scale_limit=0.5, rotate_limit=0, shift_limit=0.01, p=1, 
+                    border_mode=cv2.BORDER_CONSTANT, interpolation=cv2.INTER_NEAREST, value=255, mask_value=0),
 
             albu.OneOf([
                 albu.Compose([
-                    albu.PadIfNeeded(min_height=320, min_width=320, always_apply=True, border_mode=0),
+                    albu.PadIfNeeded(min_height=320, min_width=320, always_apply=True, 
+                        border_mode=cv2.BORDER_CONSTANT, value=255, mask_value=0),
                     albu.RandomCrop(height=320, width=320, always_apply=True),
                 ]),
                 albu.Lambda(image=QRAugmentation.resize_and_pad, mask=QRAugmentation.resize_and_pad),
@@ -156,7 +158,7 @@ class QRAugmentation(object):
         left, right = int(round(dw - 0.1)), int(round(dw + 0.1))
         img = cv2.copyMakeBorder(
             img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # add border
-    return img
+        return img
     
     @staticmethod
     def resize_and_pad(img, dsize=(320, 320), channel=1, border_color=255, **kwargs):
@@ -191,8 +193,10 @@ class QRAugmentation(object):
     def get_validation_augmentation():
         """Add paddings to make image shape divisible by 32"""
         return albu.Compose([
-            # albu.PadIfNeeded(320, 320),
-            albu.Lambda(image=QRAugmentation.resize_and_pad, mask=QRAugmentation.resize_and_pad),
+            albu.OneOf([
+                albu.Lambda(image=QRAugmentation.resize_and_pad, mask=QRAugmentation.resize_and_pad),
+                albu.Lambda(image=QRAugmentation.letterbox, mask=QRAugmentation.letterbox),
+            ], p=1.0),
         ])
 
     @staticmethod

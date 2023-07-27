@@ -155,7 +155,7 @@ class QRDefective(OrtEngine):
         image = self.resize_and_pad(image)
         image = np.expand_dims(image, 2)
         tensor = np.transpose(image, (2, 0, 1))
-        tensor = np.float32(tensor) / 127.5 - 1.0
+        tensor = np.float32(tensor)# / 127.5 - 1.0
         tensor = tensor[np.newaxis, ...]
         return tensor
     
@@ -178,8 +178,9 @@ class QRDefective(OrtEngine):
 
 
 if __name__ == '__main__':
-    model = QRDefective("../misc/qrcode-unet-mbv3-100.onnx")
+    model = QRDefective("../data/qrcode-unet-mbv3-100.3.onnx")
     gray = cv2.imread("QRCodeDatasets/defective/000002.png", 0)
     result = model(gray)
-    print(result[0].shape)
+    print(model.computation_metrics())
+    print(result.shape, result.min(), result.max())
     cv2.imwrite("result.png", np.uint8(result[0] * 255))
